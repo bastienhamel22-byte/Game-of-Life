@@ -95,7 +95,7 @@ def update():
 while setting:
     GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64): "))
     TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.3 / 0.5): "))
-    print("You will now set up your simulation. I recommand going fullscreen and zooming out using ctrl + wheel once the grid loads")
+    print("You will now set up your simulation. I recommand going fullscreen and zooming out using ctrl + wheel once the grid loads.")
     print("Press enter to continue...")
     input()
     setting = False
@@ -104,7 +104,7 @@ while setting:
     while setup :
         update()
         print("Enter a tile's coordinates to create a cell there.")
-        print("Top left corner is 0, 0 and bottom right corner is " + str(GRID_SIZE - 1))
+        print("Top left corner is 0, 0 and bottom right corner is " + str(GRID_SIZE - 1) + ", " + str(GRID_SIZE - 1))
         swap_x = int(input("Enter the tile's x coordinate: "))
         swap_y = int(input("Enter the tile's y coordinate: "))
         cell_grid[swap_y][swap_x].change_state()
