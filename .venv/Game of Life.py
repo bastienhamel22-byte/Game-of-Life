@@ -25,13 +25,61 @@ cells_deleted = 0
 cells = 0
 generation = 0
 
+#CONSTRUCTS BLUEPRINT
+GLIDER = [
+    (0, 0),
+    (1, 0),
+    (2, 0),
+    (2, 1),
+    (1, 2),
+]
 
+LIGHTWEIGHT_SPACESHIP = [
+    (1, 0),
+    (2, 0),
+    (3, 0),
+
+    (0, 1),
+    (3, 1),
+
+    (3, 2),
+
+    (0, 3),
+    (2, 3),
+]
+
+GOSPER_GUN = [
+    (0, 4), (0, 5), (1, 4), (1, 5),
+
+    (10, 4), (10, 5), (10, 6),
+    (11, 3), (11, 7),
+    (12, 2), (12, 8),
+    (13, 2), (13, 8),
+    (14, 5),
+    (15, 3), (15, 7),
+    (16, 4), (16, 5), (16, 6),
+    (17, 5),
+
+    (20, 2), (20, 3), (20, 4),
+    (21, 2), (21, 3), (21, 4),
+    (22, 1), (22, 5),
+    (24, 0), (24, 1), (24, 5), (24, 6),
+
+    (34, 2), (34, 3),
+    (35, 2), (35, 3)
+]
 
 #GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
 grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 cell_grid = []
 
-
+#THIS FUNCTION TAKES ONE OF THE CONSTRUCT'S LIST'S NAME AND BUILDS IT
+def place_construct(offsets):
+    for dx, dy in offsets:
+        x = cursor_x + dx
+        y = cursor_y + dy
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            cell_grid[y][x].change_state()
 
 class Cell() :
     global grid
@@ -129,7 +177,7 @@ while setting:
     print(f"{"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
     print()
     GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64): "))
-    TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.3 / 0.5): "))
+    TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.1 / 0.3): "))
     print("You will now set up your simulation. I recommand going fullscreen and zooming out using ctrl + wheel once the grid loads.")
     print("Press enter to continue...")
     input()
@@ -139,8 +187,7 @@ while setting:
     while setup :
         update()
 
-        print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press.")
-        print("To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
+        print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press. To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
         print("Press 'p' to place or remove a cell at the cursor's position.")
         print("Press 'c' to open the construct library.")
         print("Press 'r' to randomly fill the grid.")
@@ -174,24 +221,14 @@ while setting:
             print("The construct will be placed at the cursor's position.")
             print("1. Glider")
             print("2. Lightweight Spaceship")
+            print("3. Gosper Gun")
             construct = input(">")
             if construct == "1":
-                cell_grid[cursor_y][cursor_x].change_state()
-                cell_grid[cursor_y][cursor_x+1].change_state()
-                cell_grid[cursor_y][cursor_x+2].change_state()
-                cell_grid[cursor_y+1][cursor_x+2].change_state()
-                cell_grid[cursor_y+2][cursor_x+1].change_state()
+                place_construct(GLIDER)
             if construct == "2":
-                cell_grid[cursor_y][cursor_x].change_state()
-                cell_grid[cursor_y+1][cursor_x-1].change_state()
-                cell_grid[cursor_y+3][cursor_x-1].change_state()
-                cell_grid[cursor_y][cursor_x+1].change_state()
-                cell_grid[cursor_y][cursor_x+2].change_state()
-                cell_grid[cursor_y][cursor_x+3].change_state()
-                cell_grid[cursor_y+1][cursor_x + 3].change_state()
-                cell_grid[cursor_y+2][cursor_x + 3].change_state()
-                cell_grid[cursor_y+3][cursor_x + 2].change_state()
-
+                place_construct(LIGHTWEIGHT_SPACESHIP)
+            if construct == "3":
+                place_construct(GOSPER_GUN)
 
         while run:
             generation += 1
