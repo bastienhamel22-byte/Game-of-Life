@@ -1,5 +1,4 @@
 #SETUP
-
 import os
 import time
 import random
@@ -97,7 +96,7 @@ class Cell() :
     def change_state(self):
         self.alive = not self.alive
 
-#TRANSFER THE ALIVE STATE OF THE CELL TO ITS GRAPHIC GRID EQUIVALENT
+#TRANSFER THE ALIVE STATE OF THE CELL TO ITS GRAPHIC GRID EQUIVALENT, AND GIVES IT A COLOR BASED ON ITS AGE
     def update(self):
 
         if self.age == 0 : self.color = FAINT_GREEN
@@ -142,7 +141,7 @@ class Cell() :
 
                     alive_neighbors += cell_grid[ny][nx].alive
 
-#APPLIES THE RULES
+#APPLIES THE RULES, AND UPDATES DATA
             if cell.alive:
                 cell.next_alive = alive_neighbors in (2, 3)
                 if not cell.next_alive: cells_deleted += 1
@@ -151,6 +150,7 @@ class Cell() :
                 cell.next_alive = alive_neighbors == 3
                 if cell.next_alive: cells_created += 1
 
+#COUNTS CELLS FOR DATA
         for cell in cls.members:
             cell.alive = cell.next_alive
             if cell.alive : cells += 1
@@ -168,11 +168,13 @@ def update():
     os.system("cls" if os.name == "nt" else "clear")
 
     Cell.class_update()
-    grid[cursor_y][cursor_x] = "X"
+    if not run : grid[cursor_y][cursor_x] = "X"
+    else : grid[cursor_y][cursor_x] = EMPTY_TILE
 
     for row in grid:
         print(CELL_SPACING.join(row))
     print()
+
 while setting:
     print(f"{"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
     print()
