@@ -209,7 +209,7 @@ while setting:
         if move == "l":
             setup = False
             run = True
-#PLACES CELLS RANDOMLY
+#PLACES CELLS RANDOMLY ON THE WHOLE GRID
         if move == "r":
             for cell in Cell.members:
                 if random.choice([True, False]):
