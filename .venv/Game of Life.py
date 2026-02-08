@@ -11,6 +11,7 @@ GRID_SIZE = 64
 EMPTY_TILE = "·"
 CELL_SPACING = " "
 TIME_BETWEEN_GENERATIONS = 1
+cursor_x, cursor_y = 0, 0
 
 #GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
 grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -85,9 +86,11 @@ for y in range(GRID_SIZE):
 
 #CLEARS THE OLD GRID, COMPUTES AND PRINTS THE NEW GRAPHICS GRID.
 def update():
+    global cursor_x, cursor_y
     os.system("cls" if os.name == "nt" else "clear")
 
     Cell.class_update()
+    grid[cursor_y][cursor_x] = "X"
 
     for row in grid:
         print(CELL_SPACING.join(row))
@@ -103,15 +106,24 @@ while setting:
 
     while setup :
         update()
-        print("Enter a tile's coordinates to create a cell there.")
-        print("Top left corner is 0, 0 and bottom right corner is " + str(GRID_SIZE - 1) + ", " + str(GRID_SIZE - 1))
-        swap_x = int(input("Enter the tile's x coordinate: "))
-        swap_y = int(input("Enter the tile's y coordinate: "))
-        cell_grid[swap_y][swap_x].change_state()
-        cell_grid[swap_y][swap_x].alive = cell_grid[swap_y][swap_x].next_alive
-        update()
-        answer = input("To run the simulation, enter z. Enter anything else to continue setting up the simulation : ")
-        if answer == "z" :
+
+        print("Move the cursor with ZQSD. Press enter after each key press.")
+        print("To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
+        print("Press 'p' to place or remove a cell at the cursor's position.")
+        print("Press 'l' to launch the simulation")
+        move = input(">")
+        if move == "z":
+            cursor_y -= 1
+        if move == "s":
+            cursor_y += 1
+        if move == "q":
+            cursor_x -= 1
+        if move == "d":
+            cursor_x += 1
+        if move == "p":
+            cell_grid[cursor_y][cursor_x].change_state()
+            cell_grid[cursor_y][cursor_x].alive = cell_grid[cursor_y][cursor_x].next_alive
+        if move == "l":
             setup = False
             run = True
 
