@@ -12,6 +12,9 @@ EMPTY_TILE = "·"
 CELL_SPACING = " "
 TIME_BETWEEN_GENERATIONS = 1
 cursor_x, cursor_y = 0, 0
+cells_created = 0
+cells_deleted = 0
+cells = 0
 
 #GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
 grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -47,6 +50,9 @@ class Cell() :
 
     @classmethod
     def class_check(cls):
+        global cells_created, cells_deleted, cells
+        cells = 0
+
         for cell in cls.members:
 
             alive_neighbors = 0
@@ -76,6 +82,7 @@ class Cell() :
 
         for cell in cls.members:
             cell.alive = cell.next_alive
+            if cell.alive : cells += 1
 
 #INITIALIZES THE GRID CELL, USED FOR COMPUTING.
 for y in range(GRID_SIZE):
@@ -107,7 +114,7 @@ while setting:
     while setup :
         update()
 
-        print("Move the cursor with ZQSD. Press enter after each key press.")
+        print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press.")
         print("To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
         print("Press 'p' to place or remove a cell at the cursor's position.")
         print("Press 'l' to launch the simulation")
@@ -130,4 +137,6 @@ while setting:
         while run:
             Cell.class_check()
             update()
+            print()
+            print("Number of cells alive : " + str(cells))
             time.sleep(TIME_BETWEEN_GENERATIONS)
