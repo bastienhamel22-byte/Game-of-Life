@@ -15,6 +15,7 @@ cursor_x, cursor_y = 0, 0
 cells_created = 0
 cells_deleted = 0
 cells = 0
+generation = 0
 
 #GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
 grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -50,7 +51,8 @@ class Cell() :
 
     @classmethod
     def class_check(cls):
-        global cells_created, cells_deleted, cells
+#THOSE VARIABLES ARE USED ONLY TO KEEP TRACK OF THE DATA, SEE RUN FOR MORE INFO
+        global cells_created, cells_deleted, cells, generation
         cells = 0
 
         for cell in cls.members:
@@ -77,8 +79,10 @@ class Cell() :
 #APPLIES THE RULES
             if cell.alive:
                 cell.next_alive = alive_neighbors in (2, 3)
+                if not cell.next_alive: cells_deleted += 1
             else:
                 cell.next_alive = alive_neighbors == 3
+                if cell.next_alive: cells_created += 1
 
         for cell in cls.members:
             cell.alive = cell.next_alive
@@ -135,8 +139,12 @@ while setting:
             run = True
 
         while run:
+            generation += 1
             Cell.class_check()
             update()
             print()
+            print("Generation number " + str(generation))
             print("Number of cells alive : " + str(cells))
+            print("Number of cells created : " + str(cells_created))
+            print("Number of cells that died : " + str(cells_deleted))
             time.sleep(TIME_BETWEEN_GENERATIONS)
