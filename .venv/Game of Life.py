@@ -3,12 +3,19 @@
 import os
 import time
 
+#COLORS
+LIGHT_GREEN = "\033[1;32m"
+GREEN = "\033[0;32m"
+DARK_GRAY = "\033[1;30m"
+FAINT_GREEN = "\x1b[0;38;2;96;255;96m"
+RESET = "\033[0m"
+
 #WHILE SETTING IS TRUE, SETS UP THE "RULES", WHILE SETUP IS TRUE, SETS UP THE GRID. WHILE RUN IS TRUE, RUNS THE SIMULATION
 setting = True
 setup = False
 run = False
 GRID_SIZE = 64
-EMPTY_TILE = "·"
+EMPTY_TILE = f"{DARK_GRAY}·{RESET}"
 CELL_SPACING = " "
 TIME_BETWEEN_GENERATIONS = 1
 cursor_x, cursor_y = 0, 0
@@ -16,6 +23,8 @@ cells_created = 0
 cells_deleted = 0
 cells = 0
 generation = 0
+
+
 
 #GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
 grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -32,15 +41,23 @@ class Cell() :
         self.y = y
         self.alive = False
         self.next_alive = False
+        self.age = 0
+        self.color = LIGHT_GREEN
         Cell.members.append(self)
 
     def change_state(self):
-        self.next_alive = not self.alive
+        self.alive = not self.alive
 
 #TRANSFER THE ALIVE STATE OF THE CELL TO ITS GRAPHIC GRID EQUIVALENT
     def update(self):
+
+        if self.age == 0 : self.color = FAINT_GREEN
+        elif self.age  == 1 : self.color = LIGHT_GREEN
+        elif self.age > 1 : self.color = GREEN
+        else: self.color = LIGHT_GREEN
+
         if self.alive:
-            grid[self.y][self.x] = "O"
+            grid[self.y][self.x] = f"{self.color}O{RESET}"
         else:
             grid[self.y][self.x] = EMPTY_TILE
 
@@ -80,6 +97,7 @@ class Cell() :
             if cell.alive:
                 cell.next_alive = alive_neighbors in (2, 3)
                 if not cell.next_alive: cells_deleted += 1
+                else: cell.age += 1
             else:
                 cell.next_alive = alive_neighbors == 3
                 if cell.next_alive: cells_created += 1
@@ -121,6 +139,7 @@ while setting:
         print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press.")
         print("To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
         print("Press 'p' to place or remove a cell at the cursor's position.")
+        print("Press 'c' to open the construct librairy.")
         print("Press 'l' to launch the simulation")
         move = input(">")
         if move == "z":
@@ -133,18 +152,32 @@ while setting:
             cursor_x += 1
         if move == "p":
             cell_grid[cursor_y][cursor_x].change_state()
-            cell_grid[cursor_y][cursor_x].alive = cell_grid[cursor_y][cursor_x].next_alive
         if move == "l":
             setup = False
             run = True
+        if move == "c":
+            update()
+            print("Here are some pre-made constructs. Enter your desired construct's number. Press enter to quit.")
+            print("The construct will be placed at the cursor's position.")
+            print("1. Glider")
+            construct = input(">")
+            if construct == "1":
+                cell_grid[cursor_y][cursor_x].change_state()
+                cell_grid[cursor_y][cursor_x+1].change_state()
+                cell_grid[cursor_y][cursor_x+2].change_state()
+                cell_grid[cursor_y+1][cursor_x+2].change_state()
+                cell_grid[cursor_y+2][cursor_x+1].change_state()
+
 
         while run:
             generation += 1
             Cell.class_check()
+            density = cells * 100 / GRID_SIZE ** 2
             update()
             print()
             print("Generation number " + str(generation))
             print("Number of cells alive : " + str(cells))
             print("Number of cells created : " + str(cells_created))
             print("Number of cells that died : " + str(cells_deleted))
+            print("Density : " + str(round(density, 1)) + "%")
             time.sleep(TIME_BETWEEN_GENERATIONS)
