@@ -2,6 +2,7 @@
 
 import os
 import time
+import random
 
 #COLORS
 LIGHT_GREEN = "\033[1;32m"
@@ -139,9 +140,11 @@ while setting:
         print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press.")
         print("To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
         print("Press 'p' to place or remove a cell at the cursor's position.")
-        print("Press 'c' to open the construct librairy.")
+        print("Press 'c' to open the construct library.")
+        print("Press 'r' to randomly fill the grid.")
         print("Press 'l' to launch the simulation")
         move = input(">")
+#MOVES THE CURSOR
         if move == "z":
             cursor_y -= 1
         if move == "s":
@@ -150,11 +153,19 @@ while setting:
             cursor_x -= 1
         if move == "d":
             cursor_x += 1
+#PLACES A CELL
         if move == "p":
             cell_grid[cursor_y][cursor_x].change_state()
+#STARTS THE SIMULATION
         if move == "l":
             setup = False
             run = True
+#PLACES CELLS RANDOMLY
+        if move == "r":
+            for cell in Cell.members:
+                if random.choice([True, False]):
+                    cell.change_state()
+#OPENS CONSTRUCT LIBRARY
         if move == "c":
             update()
             print("Here are some pre-made constructs. Enter your desired construct's number. Press enter to quit.")
