@@ -126,6 +126,8 @@ def update():
         print(CELL_SPACING.join(row))
     print()
 while setting:
+    print(f"{"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
+    print()
     GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64): "))
     TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.3 / 0.5): "))
     print("You will now set up your simulation. I recommand going fullscreen and zooming out using ctrl + wheel once the grid loads.")
