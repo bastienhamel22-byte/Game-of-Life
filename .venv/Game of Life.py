@@ -6,7 +6,7 @@ import time
 #COLORS
 LIGHT_GREEN = "\033[1;32m"
 GREEN = "\033[0;32m"
-DARK_GRAY = "\033[1;30m"
+DARK_GRAY = "\x1b[0;38;2;46;90;90m"
 FAINT_GREEN = "\x1b[0;38;2;96;255;96m"
 RESET = "\033[0m"
 
@@ -160,6 +160,7 @@ while setting:
             print("Here are some pre-made constructs. Enter your desired construct's number. Press enter to quit.")
             print("The construct will be placed at the cursor's position.")
             print("1. Glider")
+            print("2. Lightweight Spaceship")
             construct = input(">")
             if construct == "1":
                 cell_grid[cursor_y][cursor_x].change_state()
@@ -167,6 +168,16 @@ while setting:
                 cell_grid[cursor_y][cursor_x+2].change_state()
                 cell_grid[cursor_y+1][cursor_x+2].change_state()
                 cell_grid[cursor_y+2][cursor_x+1].change_state()
+            if construct == "2":
+                cell_grid[cursor_y][cursor_x].change_state()
+                cell_grid[cursor_y+1][cursor_x-1].change_state()
+                cell_grid[cursor_y+3][cursor_x-1].change_state()
+                cell_grid[cursor_y][cursor_x+1].change_state()
+                cell_grid[cursor_y][cursor_x+2].change_state()
+                cell_grid[cursor_y][cursor_x+3].change_state()
+                cell_grid[cursor_y+1][cursor_x + 3].change_state()
+                cell_grid[cursor_y+2][cursor_x + 3].change_state()
+                cell_grid[cursor_y+3][cursor_x + 2].change_state()
 
 
         while run:
