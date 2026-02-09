@@ -14,7 +14,7 @@ RESET = "\033[0m"
 setting = True
 setup = False
 run = False
-GRID_SIZE = 64
+GRID_SIZE = 128
 EMPTY_TILE = f"{DARK_GRAY}·{RESET}"
 CELL_SPACING = " "
 TIME_BETWEEN_GENERATIONS = 1
@@ -23,6 +23,20 @@ cells_created = 0
 cells_deleted = 0
 cells = 0
 generation = 0
+
+def create_grid(size):
+    global GRID_SIZE, grid, cell_grid
+    GRID_SIZE = size
+
+    grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+    cell_grid = []
+    Cell.members.clear()
+
+    for y in range(GRID_SIZE):
+        row = []
+        for x in range(GRID_SIZE):
+            row.append(Cell(x, y))
+        cell_grid.append(row)
 
 #CONSTRUCTS BLUEPRINT
 GLIDER = [
@@ -37,14 +51,15 @@ LIGHTWEIGHT_SPACESHIP = [
     (1, 0),
     (2, 0),
     (3, 0),
+    (4, 0),
 
     (0, 1),
-    (3, 1),
+    (4, 1),
 
-    (3, 2),
+    (4, 2),
 
     (0, 3),
-    (2, 3),
+    (3, 3),
 ]
 
 GOSPER_GUN = [
@@ -67,10 +82,6 @@ GOSPER_GUN = [
     (34, 2), (34, 3),
     (35, 2), (35, 3)
 ]
-
-#GRID IS THE GRAPHIC GRID, CELL_GRID IS THE COMPUTING GRID
-grid = [[EMPTY_TILE for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-cell_grid = []
 
 #THIS FUNCTION TAKES ONE OF THE CONSTRUCT'S LIST'S NAME AND BUILDS IT
 def place_construct(offsets):
@@ -116,6 +127,7 @@ class Cell() :
 
     @classmethod
     def class_check(cls):
+
 #THOSE VARIABLES ARE USED ONLY TO KEEP TRACK OF THE DATA, SEE RUN FOR MORE INFO
         global cells_created, cells_deleted, cells, generation
         cells = 0
@@ -144,7 +156,9 @@ class Cell() :
 #APPLIES THE RULES, AND UPDATES DATA
             if cell.alive:
                 cell.next_alive = alive_neighbors in (2, 3)
-                if not cell.next_alive: cells_deleted += 1
+                if not cell.next_alive:
+                    cells_deleted += 1
+                    cell.age = 0
                 else: cell.age += 1
             else:
                 cell.next_alive = alive_neighbors == 3
@@ -154,13 +168,6 @@ class Cell() :
         for cell in cls.members:
             cell.alive = cell.next_alive
             if cell.alive : cells += 1
-
-#INITIALIZES THE GRID CELL, USED FOR COMPUTING.
-for y in range(GRID_SIZE):
-    row = []
-    for x in range(GRID_SIZE):
-        row.append(Cell(x, y))
-    cell_grid.append(row)
 
 #CLEARS THE OLD GRID, COMPUTES AND PRINTS THE NEW GRAPHICS GRID.
 def update():
@@ -176,11 +183,14 @@ def update():
     print()
 
 while setting:
-    print(f"{"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
+    print("xX----------------------------------------Xx")
+    print(f"      {"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
+    print("xX----------------------------------------Xx")
     print()
-    GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64): "))
+    GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64, but 120 is better (if your computer can take it)): "))
+    create_grid(GRID_SIZE)
     TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.1 / 0.3): "))
-    print("You will now set up your simulation. I recommand going fullscreen and zooming out using ctrl + wheel once the grid loads.")
+    print("You will now set up your simulation. I recommend going fullscreen and zooming out until you see everything using ctrl + wheel once the grid loads.")
     print("Press enter to continue...")
     input()
     setting = False
@@ -189,33 +199,46 @@ while setting:
     while setup :
         update()
 
-        print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press. To make this process more comfortable, put one hand over the enter key and the other over the movement keys.")
+        print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press. After going in a direction once, press enter to move in that same direction again")
         print("Press 'p' to place or remove a cell at the cursor's position.")
         print("Press 'c' to open the construct library.")
         print("Press 'r' to randomly fill the grid.")
         print("Press 'l' to launch the simulation")
         move = input(">")
+
 #MOVES THE CURSOR
         if move == "z":
-            cursor_y -= 1
+            move_x = 0
+            move_y = -1
         if move == "s":
-            cursor_y += 1
+            move_x = 0
+            move_y = 1
         if move == "q":
-            cursor_x -= 1
+            move_x = -1
+            move_y = 0
         if move == "d":
-            cursor_x += 1
+            move_x = 1
+            move_y = 0
+
 #PLACES A CELL
         if move == "p":
             cell_grid[cursor_y][cursor_x].change_state()
+
 #STARTS THE SIMULATION
         if move == "l":
-            setup = False
-            run = True
+            update()
+            print("If you run the simulation now, you will not be able to go back without closing and reopening the code.")
+            print("Press enter to continue anyway, or press 'q' to quit")
+            if input(">") != "q":
+                setup = False
+                run = True
+
 #PLACES CELLS RANDOMLY ON THE WHOLE GRID
         if move == "r":
             for cell in Cell.members:
                 if random.choice([True, False]):
                     cell.change_state()
+
 #OPENS CONSTRUCT LIBRARY
         if move == "c":
             update()
@@ -231,6 +254,10 @@ while setting:
                 place_construct(LIGHTWEIGHT_SPACESHIP)
             if construct == "3":
                 place_construct(GOSPER_GUN)
+
+        if move != "r" and move != "l" and move != "c" and move != "p":
+            cursor_x += move_x
+            cursor_y += move_y
 
         while run:
             generation += 1
