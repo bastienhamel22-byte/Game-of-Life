@@ -8,6 +8,7 @@ LIGHT_GREEN = "\033[1;32m"
 GREEN = "\033[0;32m"
 DARK_GRAY = "\x1b[0;38;2;46;90;90m"
 FAINT_GREEN = "\x1b[0;38;2;96;255;96m"
+ORANGE = "\x1b[0;38;2;243;184;3;49m"
 RESET = "\033[0m"
 
 #WHILE SETTING IS TRUE, SETS UP THE "RULES", WHILE SETUP IS TRUE, SETS UP THE GRID. WHILE RUN IS TRUE, RUNS THE SIMULATION
@@ -23,6 +24,7 @@ cells_created = 0
 cells_deleted = 0
 cells = 0
 generation = 0
+paused = False
 
 def create_grid(size):
     global GRID_SIZE, grid, cell_grid
@@ -172,7 +174,7 @@ class Cell() :
 #CLEARS THE OLD GRID, COMPUTES AND PRINTS THE NEW GRAPHICS GRID.
 def update():
     global cursor_x, cursor_y
-    os.system("cls" if os.name == "nt" else "clear")
+    print("\033[2J\033[H", end="")
 
     Cell.class_update()
     if not run : grid[cursor_y][cursor_x] = "X"
@@ -187,12 +189,23 @@ while setting:
     print(f"      {"\x1b[3;1;4;38;2;0;183;91;49m"}WELCOME TO THE GAME OF LIFE{RESET}")
     print("xX----------------------------------------Xx")
     print()
-    GRID_SIZE = int(input("What should be the size of the grid? (Recommended = 64, but 120 is better (if your computer can take it)): "))
+    print()
+    print()
+    print()
+    print("What should be the size of the grid? (Recommended = 16, 32 or 64, but 118 is better (if your computer can take it))")
+    print("Using values different than the recommended ones may hide part of the grid depending on your screen's resolution.")
+    GRID_SIZE = int(input(">"))
     create_grid(GRID_SIZE)
-    TIME_BETWEEN_GENERATIONS = float(input("What should the time, in seconds, between generations be? (Recommended = 0.1 / 0.3): "))
-    print("You will now set up your simulation. I recommend going fullscreen and zooming out until you see everything using ctrl + wheel once the grid loads.")
+    print()
+    print()
+    print("What should the time, in seconds, between generations be? (Recommended = 0.1 / 0.3)")
+    TIME_BETWEEN_GENERATIONS = float(input(">"))
+    print()
+    print()
+    print(f"You will now set up your simulation. {ORANGE}I recommend going fullscreen and zooming out until you see everything using ctrl + wheel once the grid loads.{RESET}")
     print("Press enter to continue...")
     input()
+    os.system("cls" if os.name == "nt" else "clear")
     setting = False
     setup = True
 
@@ -200,10 +213,11 @@ while setting:
         update()
 
         print("Move the cursor with ZQSD. If you are using a QWERTY keyboard, I recommend changing the code accordingly. Press enter after each key press. After going in a direction once, press enter to move in that same direction again")
-        print("Press 'p' to place or remove a cell at the cursor's position.")
-        print("Press 'c' to open the construct library.")
-        print("Press 'r' to randomly fill the grid.")
-        print("Press 'l' to launch the simulation")
+        print("Enter 'p' to place or remove a cell at the cursor's position.")
+        print("Enter 'c' to open the construct library.")
+        print("Enter 'r' to randomly fill the grid.")
+        print("Enter 'o' to reset the grid.")
+        print("Enter 'l' to launch the simulation")
         move = input(">")
 
 #MOVES THE CURSOR
@@ -227,17 +241,22 @@ while setting:
 #STARTS THE SIMULATION
         if move == "l":
             update()
-            print("If you run the simulation now, you will not be able to go back without closing and reopening the code.")
-            print("Press enter to continue anyway, or press 'q' to quit")
-            if input(">") != "q":
-                setup = False
-                run = True
+
+            setup = False
+            run = True
 
 #PLACES CELLS RANDOMLY ON THE WHOLE GRID
         if move == "r":
             for cell in Cell.members:
                 if random.choice([True, False]):
                     cell.change_state()
+
+        if move == "o":
+            for cell in Cell.members:
+                cell.alive = False
+
+            cells_created = 0
+            cells_deleted = 0
 
 #OPENS CONSTRUCT LIBRARY
         if move == "c":
@@ -260,14 +279,31 @@ while setting:
             cursor_y += move_y
 
         while run:
-            generation += 1
-            Cell.class_check()
-            density = cells * 100 / GRID_SIZE ** 2
-            update()
-            print()
-            print("Generation number " + str(generation))
-            print("Number of cells alive : " + str(cells))
-            print("Number of cells created : " + str(cells_created))
-            print("Number of cells that died : " + str(cells_deleted))
-            print("Density : " + str(round(density, 1)) + "%")
-            time.sleep(TIME_BETWEEN_GENERATIONS)
+            if not paused :
+                generation += 1
+
+                Cell.class_check()
+
+                density = cells * 100 / GRID_SIZE ** 2
+
+                update()
+
+                print("Press enter to pause, and 'q' to quit to setup.")
+                print("Generation number " + str(generation))
+                print("Number of cells alive : " + str(cells))
+                print("Number of cells created : " + str(cells_created))
+                print("Number of cells that died : " + str(cells_deleted))
+                print("Density : " + str(round(density, 1)) + "%")
+                time.sleep(TIME_BETWEEN_GENERATIONS)
+
+            # NON-BLOCKING INPUT CHECK
+            if os.name == "nt":
+                import msvcrt
+
+                if msvcrt.kbhit():
+                    key = msvcrt.getwch()
+                    if key == " ":
+                        paused = not paused
+                    elif key == "q":
+                        run = False
+                        setup = True
